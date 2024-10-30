@@ -1,6 +1,6 @@
 workflows:
   build:
-    name: Build APK to Prod
+    name: Build Prod APK
     max_build_duration: 60
     instance_type: mac_mini_m2
     environment:
@@ -11,6 +11,7 @@ workflows:
       branch_patterns:
         - pattern: "main"
           include: true
+      cancel_previous_builds: true
     scripts:
       - name: Install dependencies
         script: |
@@ -24,6 +25,44 @@ workflows:
           flutter build apk
     artifacts:
       - build/app/outputs/flutter-apk/*.apk
+    publishing:
+      email:
+        recipients:
+          - ilauret@somniosoftware.com
+        notify:
+          success: true
+          failure: true
+  build:
+    name: Build Feature Branch PR
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      flutter: stable
+    triggering:
+      events:
+        - pull_request
+      branch_patterns:
+        - pattern: "main"
+          include: true
+          source: false
+      cancel_previous_builds: true
+    scripts:
+      - name: Install dependencies
+        script: |
+          flutter pub get
+      - name: Analyze Code
+        script: flutter analyze
+      - name: Run Tests
+        script: flutter test
+      - name: Build Android APK
+        script: |
+          flutter build apk
+      - name: Generate release note with Git Branch name
+        script: |
+          echo "$CM_BRANCH" | tee release_notes.txt
+    artifacts:
+      - build/app/outputs/flutter-apk/*.apk
+      - release_notes.txt
     publishing:
       email:
         recipients:
