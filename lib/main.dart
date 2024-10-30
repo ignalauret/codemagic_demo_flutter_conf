@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Codemagic Flutter Conf',
+      title: 'Codemagic Flutter Conf Updated',
       theme: ThemeData(
         // This is the theme of your application.
         //
